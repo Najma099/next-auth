@@ -1,6 +1,7 @@
 import { Poppins } from "next/font/google";
 import { cn } from "@/lib/utils";
 import {Button} from "@/components/ui/button"
+import {LoginButton} from '@/components/auth/login-button'
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -26,11 +27,13 @@ export default function Home() {
         aria-hidden="true"
       />
 
-      <div className="relative z-10 space-y-6 text-center">
-        <h1 className="text-4xl font-bold">Auth</h1>
+      <div className="relative z-10 space-y-6 text-center font-serif">
+        <h1 className="text-4xl font-bold drop-shadow-md">Auth</h1>
         <p className="text-lg">A Simple authentication service</p>
         <div>
-          <Button variant='secondary' size='lg'> Sign in</Button>
+          <LoginButton>
+            <Button variant='secondary' size='lg' className='text-xl'> Sign in</Button>
+          </LoginButton>
         </div>
       </div>
     </main>
