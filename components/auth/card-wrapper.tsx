@@ -23,7 +23,7 @@ export const CardWrapper = ({
     showSocialmessage,
 }: CardWrapperProps) => {
     return(
-       <Card className='w-full max-w-md mx-auto p-5 sm:mt-20 '>
+       <Card className='w-full max-w-md mx-auto p-5'>
         <CardHeader>
             <Header label={headerLabel}/>
         </CardHeader>
