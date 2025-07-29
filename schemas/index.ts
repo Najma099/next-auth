@@ -5,7 +5,7 @@ export const LoginSchema = z.object({
     .string()
     .trim()
     .email({ message: "Invalid email" })
-    .max(20, { message: "Email cannot be more than 20 characters" }),
+    .max(30, { message: "Email cannot be more than 20 characters" }),
 
   password: z
     .string()
@@ -20,7 +20,7 @@ export const RegisterSchema = z.object({
     .trim()
     .min(1, { message: "Email is required" })
     .email({ message: "Invalid email" })
-    .max(20, { message: "Email cannot be more than 20 characters" }),
+    .max(30, { message: "Email cannot be more than 20 characters" }),
 
   password: z
     .string()
