@@ -2,6 +2,7 @@
 
 import {CardWrapper} from '@/components/auth/card-wrapper'
 import * as z from 'zod'
+import { useSearchParams} from 'next/navigation'
 import {useTransition, useState} from 'react'
 import {useForm} from 'react-hook-form'
 import {zodResolver} from '@hookform/resolvers/zod'
@@ -10,7 +11,10 @@ import {Input} from '@/components/ui/input'
 import {Button} from '@/components/ui/button'
 import {FormError} from '@/components/utils/form-error'
 import {FormSucess} from '@/components/utils/form-sucess'
-import {Login} from '@/actions/login'
+import {genereteVerificationToken} from '@/lib/token'
+import { getUserByEmail} from '@/data/user'
+import { resendVerificationEmail } from '@/actions/resend-verification';
+
 import {
     Form,
     FormControl,
@@ -19,14 +23,23 @@ import {
     FormLabel,
     FormMessage,
 } from'@/components/ui/form'
+import { signIn } from 'next-auth/react'
+import { DEFAULT_LOGIN_REDIRECT } from '@/route'
+import { useRouter } from 'next/navigation'
 
 export const LoginForm = () => {
 
+    const searchParams = useSearchParams();
+    const urlError = searchParams.get("error")=== 'OAuthAccountNotLinked'
+        ? "Email is linked with different credential Provider"
+        : ""
+    
+    const router = useRouter();
     const [isPending, startTransition] = useTransition();
-    const [error, setError] = useState<string | undefined >('');
-    const [success, setSuccess] = useState <string | undefined>('');
+    const [error, setError] = useState<string | undefined>('');
+    const [success, setSuccess] = useState<string | undefined>('');
 
-    const form = useForm< z.infer< typeof LoginSchema > >({
+    const form = useForm<z.infer<typeof LoginSchema>>({
         resolver: zodResolver(LoginSchema),
         defaultValues: {
             email: "",
@@ -34,18 +47,64 @@ export const LoginForm = () => {
         }
     });
 
-    const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+    const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
         setError("");
         setSuccess("");
 
-        startTransition(() => {
-            Login(values)
-                .then( (data) => {
-                    setError(data.error)
-                    setSuccess(data.success)
-                })
-        })
-    }
+        const validated = LoginSchema.safeParse(values);
+        console.log()
+
+        if (!validated.success) {
+            setError("Invalid fields");
+            return;
+        }
+
+        const { email, password } = validated.data;
+
+        try {
+            const result = await signIn("credentials", {
+                email: validated.data.email,
+                password: validated.data.password,
+                redirect: false,
+            });
+
+            if (result?.error) {
+                switch (result.error) {
+                    case "EmailNotVerified":
+                        const resend = await resendVerificationEmail(email);
+                        if (resend.error) {
+                            setError(resend.error);
+                        } else {
+                            setSuccess(resend.success || "Verification email sent!");
+                        }
+                        break;
+
+                    case "CredentialsSignin":
+                        setError("Invalid email or password!");
+                        break;
+
+                    case "CallbackRouteError":
+                        setError("Invalid credentials!");
+                        break;
+
+                    default:
+                        setError("Something went wrong!");
+                }
+            } else if (result?.ok) {
+                setSuccess("Login successful! Redirecting...");
+                setTimeout(() => {
+                    router.push(DEFAULT_LOGIN_REDIRECT);
+                }, 1000);
+            } else {
+                setError("Something went wrong!");
+            }
+        } catch (err) {
+            console.error("Login error:", err);
+            setError("Network error. Please try again.");
+        }
+    };
+
+
     return(
         <CardWrapper
             headerLabel="Welcome back"
@@ -69,6 +128,7 @@ export const LoginForm = () => {
                                             disabled={isPending}
                                             placeholder='john.doe@example.com'
                                             type='email'
+                                            autoComplete="email"
                                         />
                                     </FormControl>
                                     <FormMessage/>
@@ -87,6 +147,7 @@ export const LoginForm = () => {
                                             disabled={isPending}
                                             placeholder='*******'
                                             type='password'
+                                            autoComplete="current-password"
                                         />
                                     </FormControl>
                                     <FormMessage/>
@@ -94,10 +155,10 @@ export const LoginForm = () => {
                             )}
                         />
                     </div>
-                    <FormError message={error}/>
+                    <FormError message={error || urlError}/>
                     <FormSucess message={success}/>
-                    <Button type='submit' className='w-full'  disabled={isPending}>
-                        Login
+                    <Button type='submit' className='w-full' disabled={isPending}>
+                        {isPending ? "Signing in..." : "Sign in"}
                     </Button>
                 </form>
             </Form>
