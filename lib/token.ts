@@ -4,10 +4,12 @@ import { getVerificationTokenByEmail} from '@/data/verification-token'
 
 export const genereteVerificationToken = async ( email: string) => {
    const token = uuidv4();
+   console.log("Generated UUID:", token);
    const expires = new Date(new Date().getTime() + 3600 *  1000);
    const existingToken = await getVerificationTokenByEmail(email);
 
     if(existingToken) {
+        console.log("Deleting existing token:", existingToken.id);
         await db.verificationToken.delete({
             where: {
                 id:existingToken.id
@@ -22,5 +24,6 @@ export const genereteVerificationToken = async ( email: string) => {
             expires
         }
     });
+    console.log("Inserted new token:", verificationToken);
     return verificationToken;   
 }

@@ -11,8 +11,7 @@ import {Input} from '@/components/ui/input'
 import {Button} from '@/components/ui/button'
 import {FormError} from '@/components/utils/form-error'
 import {FormSucess} from '@/components/utils/form-sucess'
-import {genereteVerificationToken} from '@/lib/token'
-import { getUserByEmail} from '@/data/user'
+import axios from 'axios'
 import {
     Form,
     FormControl,
@@ -57,15 +56,25 @@ export const LoginForm = () => {
         }
 
         const { email, password } = validated.data;
-        const existingUser = await getUserByEmail(email);
+        const res = await axios.post("/api/auth/login/check-user", {
+            email,
+        });
+        //console.log(res);
+        const existingUser = res.data.user;
+        //console.log(existingUser)
 
         if(!existingUser || !existingUser.email || !existingUser.password) {
            return setError("Email doesn't exits");
         }
 
         if(!existingUser.emailVerified) {
-            const verificationToken = await genereteVerificationToken(existingUser.email);
-            return setSuccess("Confirmation Email send!");
+            console.log("inside");
+            const res = await axios.post("/api/auth/generate-token",{email})
+            console.log("res:",res);
+            const verificationToken = res.data.token;
+            console.log("verification:",verificationToken);
+            console.log("Token fixed")
+            return setError("Confirmation Email send! Please confirm your email");
         }
 
         startTransition(() => {
