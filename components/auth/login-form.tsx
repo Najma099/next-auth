@@ -13,8 +13,6 @@ import {FormError} from '@/components/utils/form-error'
 import {FormSucess} from '@/components/utils/form-sucess'
 import {genereteVerificationToken} from '@/lib/token'
 import { getUserByEmail} from '@/data/user'
-import { resendVerificationEmail } from '@/actions/resend-verification';
-
 import {
     Form,
     FormControl,
@@ -52,7 +50,6 @@ export const LoginForm = () => {
         setSuccess("");
 
         const validated = LoginSchema.safeParse(values);
-        console.log()
 
         if (!validated.success) {
             setError("Invalid fields");
@@ -60,50 +57,50 @@ export const LoginForm = () => {
         }
 
         const { email, password } = validated.data;
+        const existingUser = await getUserByEmail(email);
 
-        try {
-            const result = await signIn("credentials", {
+        if(!existingUser || !existingUser.email || !existingUser.password) {
+           return setError("Email doesn't exits");
+        }
+
+        if(!existingUser.emailVerified) {
+            const verificationToken = await genereteVerificationToken(existingUser.email);
+            return setSuccess("Confirmation Email send!");
+        }
+
+        startTransition(() => {
+            signIn("credentials", {
                 email: validated.data.email,
                 password: validated.data.password,
                 redirect: false,
-            });
-
-            if (result?.error) {
-                switch (result.error) {
-                    case "EmailNotVerified":
-                        const resend = await resendVerificationEmail(email);
-                        if (resend.error) {
-                            setError(resend.error);
-                        } else {
-                            setSuccess(resend.success || "Verification email sent!");
-                        }
-                        break;
-
-                    case "CredentialsSignin":
-                        setError("Invalid email or password!");
-                        break;
-
-                    case "CallbackRouteError":
-                        setError("Invalid credentials!");
-                        break;
-
-                    default:
-                        setError("Something went wrong!");
+            })
+            .then((result) => {
+                if (result?.error) {
+                    switch (result.error) {
+                        case "CredentialsSignin":
+                            setError("Invalid email or password!");
+                            break;
+                        case "CallbackRouteError":
+                            setError("Invalid credentials!");
+                            break;
+                        default:
+                            setError("Something went wrong!");
+                    }
+                } else if (result?.ok) {
+                    setSuccess("Login successful! Redirecting...");
+                    setTimeout(() => {
+                        router.push(DEFAULT_LOGIN_REDIRECT);
+                    }, 1000);
+                } else {
+                    setError("Something went wrong!");
                 }
-            } else if (result?.ok) {
-                setSuccess("Login successful! Redirecting...");
-                setTimeout(() => {
-                    router.push(DEFAULT_LOGIN_REDIRECT);
-                }, 1000);
-            } else {
-                setError("Something went wrong!");
-            }
-        } catch (err) {
-            console.error("Login error:", err);
-            setError("Network error. Please try again.");
-        }
-    };
-
+            })
+            .catch((err) => {
+                console.error("Login error:", err);
+                setError("Network error. Please try again.");
+            });
+        });
+    }
 
     return(
         <CardWrapper
