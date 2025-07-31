@@ -5,6 +5,7 @@ export const sendPasswordResetEmail = async (
     email: string,
     token: string
 ) => {
+    console.log("token inside the email:",token);
     const confirmLink = `http://localhost:3000/auth/new-password?token=${token}`;
 
     await resend.emails.send({

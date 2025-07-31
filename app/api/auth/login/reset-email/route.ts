@@ -16,7 +16,7 @@ export async function POST(req: Request) {
         const { email } = parsed.data;
 
         const user = await getUserByEmail(email);
-        console.log(user);
+        console.log("user",user);
         if (!user) {
             return NextResponse.json({ error: "Email doesn't exists" });
         }
@@ -25,6 +25,7 @@ export async function POST(req: Request) {
 
         // TODO: Generate and send reset email here
         const passwordResentToken = await generatePasswordResetToken(email);
+        console.log(" passwordResentToken:",passwordResentToken);
         await sendPasswordResetEmail(passwordResentToken.email, passwordResentToken.token);
 
         return NextResponse.json({ message: "Reset email sent" });

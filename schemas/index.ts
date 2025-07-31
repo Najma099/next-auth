@@ -36,7 +36,7 @@ export const RegisterSchema = z.object({
 });
 
 export const ResetSchema = z.object({
-   email: z
+  email: z
     .string()
     .trim()
     .min(1, { message: "Email is required" })
@@ -44,3 +44,10 @@ export const ResetSchema = z.object({
     .max(30, { message: "Email cannot be more than 30 characters" }),
 })
 
+export const NewPasswordSchema = z.object( {
+  password: z
+    .string()
+    .trim()
+    .min(5, { message: "Minimum 5 characters required" })
+    .max(12, { message: "Maximum 12 characters allowed" }),
+})

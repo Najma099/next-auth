@@ -23,6 +23,7 @@ export const generatePasswordResetToken = async( email: string) => {
             expires
         }
     });
+    console.log("passwordResetToken:",passwordResetToken);
     return passwordResetToken;   
 }
 

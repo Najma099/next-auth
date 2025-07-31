@@ -1,33 +1,31 @@
 import { NextResponse } from "next/server";
 import { db } from '@/lib/db';
 import { getUserByEmail } from '@/data/user';
-import { getVerificationTokenByToken } from '@/data/verification-token';
+import {  getPasswordTokenByToken } from '@/data/password-resend-token';
 
 export async function POST(req: Request) {
   try {
     const { token } = await req.json();
+    console.log(token);
 
-    const existingToken = await getVerificationTokenByToken(token);
+    const existingToken = await getPasswordTokenByToken(token);
     if (!existingToken) {
       return NextResponse.json(
-            { error: "Token doesn't exist!" }, 
-            { status: 400 }
+          { error: "Token doesn't exist!" }, 
         );
     }
 
     const hasExpired = new Date(existingToken.expires) < new Date();
     if (hasExpired) {
       return NextResponse.json(
-            { error: "Token has expired!" }, 
-            { status: 400 }
+          { error: "Token has expired!" }, 
         );
     }
 
     const existingUser = await getUserByEmail(existingToken.email);
     if (!existingUser) {
       return NextResponse.json(
-            { error: "Email does not exist!" }, 
-            { status: 404 }
+          { error: "Email does not exist!" }, 
         );
     }
 
