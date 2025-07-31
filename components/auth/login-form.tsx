@@ -1,25 +1,19 @@
 "use client"
 
-import {CardWrapper} from '@/components/auth/card-wrapper'
+import { CardWrapper } from '@/components/auth/card-wrapper'
 import * as z from 'zod'
-import { useSearchParams} from 'next/navigation'
-import {useTransition, useState} from 'react'
-import {useForm} from 'react-hook-form'
-import {zodResolver} from '@hookform/resolvers/zod'
+import { useSearchParams } from 'next/navigation'
+import { useTransition, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { LoginSchema } from '@/schemas'
-import {Input} from '@/components/ui/input'
-import {Button} from '@/components/ui/button'
-import {FormError} from '@/components/utils/form-error'
-import {FormSucess} from '@/components/utils/form-sucess'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { FormError } from '@/components/utils/form-error'
+import { FormSucess } from '@/components/utils/form-sucess'
 import axios from 'axios'
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from'@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from'@/components/ui/form'
 import { signIn } from 'next-auth/react'
 import { DEFAULT_LOGIN_REDIRECT } from '@/route'
 import { useRouter } from 'next/navigation'
@@ -44,48 +38,35 @@ export const LoginForm = () => {
         }
     });
 
-    const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
+    const onSubmit = (values: z.infer<typeof LoginSchema>) => {
         setError("");
         setSuccess("");
 
         const validated = LoginSchema.safeParse(values);
-
         if (!validated.success) {
-            setError("Invalid fields");
-            return;
+            return setError("Invalid fields");
         }
 
-        const { email, password } = validated.data;
-        const res = await axios.post("/api/auth/login/check-user", {
-            email,
-        });
-        //console.log(res);
-        const existingUser = res.data.user;
-        //console.log(existingUser)
+        startTransition( async() => {
 
-        if(!existingUser || !existingUser.email || !existingUser.password) {
-           return setError("Email doesn't exits");
-        }
+            const { email, password } = validated.data;
+            const res = await axios.post("/api/auth/login/check-user", {email});
 
-       //console.log("emailVerified value:", existingUser.emailVerified);
-        if(!existingUser.emailVerified) {
-            //console.log("inside");
-            const res = await axios.post("/api/auth/login/generate-token",
-                {email},
-                {
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                }    
-            )
-            //console.log("res:",res);
-            const verificationToken = res.data.token;
-            //console.log("verification:",verificationToken);
-            //console.log("Token fixed")
-            return setError("Confirmation Email send! Please confirm your email");
-        }
+            const existingUser = res.data.user;
+            if(!existingUser || !existingUser.email || !existingUser.password) {
+            return setError("Email doesn't exits");
+            }
 
-        startTransition(() => {
+            if(!existingUser.emailVerified) {
+                const res = await axios.post("/api/auth/login/generate-token",{email},
+                    {   headers: {
+                            "Content-Type": "application/json"
+                        }
+                    }    
+                )
+                const verificationToken = res.data.token;
+                return setError("Confirmation Email send, Please confirm your email");
+            }
             signIn("credentials", {
                 email: validated.data.email,
                 password: validated.data.password,
@@ -113,7 +94,6 @@ export const LoginForm = () => {
                 }
             })
             .catch((err) => {
-                //console.error("Login error:", err);
                 setError("Network error. Please try again.");
             });
         });
@@ -154,7 +134,7 @@ export const LoginForm = () => {
                             name='password'
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>Password</FormLabel>
+                                    <FormLabel >Password</FormLabel>
                                     <FormControl>
                                         <Input
                                             {...field}
@@ -164,6 +144,14 @@ export const LoginForm = () => {
                                             autoComplete="current-password"
                                         />
                                     </FormControl>
+                                    <Button 
+                                        size='sm'
+                                        variant='link'
+                                        asChild
+                                        className='w-full text-left justify-start px-0 text-xs'
+                                    >
+                                        <Link href='/auth/reset'>Forgot Passport?</Link>
+                                    </Button>
                                     <FormMessage/>
                                 </FormItem>
                             )}
