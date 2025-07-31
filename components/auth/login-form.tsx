@@ -67,13 +67,21 @@ export const LoginForm = () => {
            return setError("Email doesn't exits");
         }
 
+       //console.log("emailVerified value:", existingUser.emailVerified);
         if(!existingUser.emailVerified) {
-            console.log("inside");
-            const res = await axios.post("/api/auth/generate-token",{email})
-            console.log("res:",res);
+            //console.log("inside");
+            const res = await axios.post("/api/auth/login/generate-token",
+                {email},
+                {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }    
+            )
+            //console.log("res:",res);
             const verificationToken = res.data.token;
-            console.log("verification:",verificationToken);
-            console.log("Token fixed")
+            //console.log("verification:",verificationToken);
+            //console.log("Token fixed")
             return setError("Confirmation Email send! Please confirm your email");
         }
 
@@ -105,7 +113,7 @@ export const LoginForm = () => {
                 }
             })
             .catch((err) => {
-                console.error("Login error:", err);
+                //console.error("Login error:", err);
                 setError("Network error. Please try again.");
             });
         });
