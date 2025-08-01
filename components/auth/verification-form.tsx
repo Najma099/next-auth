@@ -6,6 +6,8 @@ import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState} from 'react'
 import {FormError} from '@/components/utils/form-error'
 import {FormSucess} from '@/components/utils/form-sucess'
+import { DEFAULT_LOGIN_REDIRECT } from '@/route'
+import { useRouter } from 'next/navigation'
 import axios from 'axios'
 
 export const NewVerificationForm = () => {
@@ -14,6 +16,7 @@ export const NewVerificationForm = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState< string | undefined>();
     const [success, setSuccess] =  useState< string | undefined>();
+    const router = useRouter();
 
     const onSubmit = useCallback(async () => {
         if(!token) {
@@ -30,6 +33,10 @@ export const NewVerificationForm = () => {
             if (res.data.success) {
                 //console.log("✅ Email verified");
                 setSuccess(res.data.success);
+                setTimeout(() => {
+                    router.push(DEFAULT_LOGIN_REDIRECT);
+                }, 1500);
+                
             } else {
                 //console.log("❌ Verification error:", res.data.error);
                 setError(res.data.error)

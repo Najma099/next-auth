@@ -1,18 +1,18 @@
 import { db } from '@/lib/db'
 
 export const getPasswordTokenByToken = async ( token: string) => {
-    console.log("getPasswordTokenByToken getting called inside");
+    //console.log("getPasswordTokenByToken getting called inside");
     try {
         const passwordResetToken = await db.passwordResetToken.findUnique({
             where: {
                 token
             }
         });
-        console.log("passwordResetToken:",passwordResetToken);
+        //console.log("passwordResetToken:",passwordResetToken);
         return passwordResetToken;
     }
     catch(err) {
-        console.log("coming out");
+        //console.log("coming out");
         return null;
     }
 }

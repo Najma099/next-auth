@@ -2,6 +2,7 @@ import NextAuth from "next-auth"
 import authConfig from '@/auth.config'
 import {getUserById} from '@/data/user'
 import { PrismaAdapter } from "@auth/prisma-adapter"
+import { getTwoFactorConfirmationByUserId } from '@/data/two-factor-confirmation'
 import { db} from '@/lib/db'
 
 
@@ -26,6 +27,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             const existingUser = await getUserById(user.id);
             if(!existingUser?.emailVerified) return false;
 
+            console.log("existingUser.isTwoFactorEnabled",existingUser.isTwoFactorEnabled);
+            if(existingUser.isTwoFactorEnabled) {
+               const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id);
+                if(!twoFactorConfirmation ) {
+                    console.log("inside auth so we are returning false here");
+                    return false;
+                }
+
+                await db.twoFactorConfirmation.delete({
+                    where: {id: twoFactorConfirmation.id}
+                })
+            }
             return true;
         },
         async session({ session, token }) {

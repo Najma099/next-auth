@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { db } from '@/lib/db';
 import { getUserByEmail } from '@/data/user';
-import {  getPasswordTokenByToken } from '@/data/password-resend-token';
+import { getVerificationTokenByToken } from '@/data/verification-token';
 
 export async function POST(req: Request) {
   try {
     const { token } = await req.json();
-    console.log(token);
+    //console.log(token);
 
-    const existingToken = await getPasswordTokenByToken(token);
+    const existingToken = await getVerificationTokenByToken(token);
     if (!existingToken) {
       return NextResponse.json(
           { error: "Token doesn't exist!" }, 
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: "Email verified!" });
   } catch (err) {
-    console.error("❌ Verification error:", err);
+    //console.error("❌ Verification error:", err);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
