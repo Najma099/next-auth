@@ -8,8 +8,12 @@ import { UserRole } from '@prisma/client'
 import { toast } from 'sonner'
 import axios from 'axios'
 import { admin } from '@/actions/admin'
-// import { currentRole } from '@/lib/auth'
-export const AdminPage =  () => {
+
+type AdminResponse = {
+  success?: string;
+  error?: string;
+}
+const AdminPage = () => {
 
     const onApiRouteClick = async () => {
         try {
@@ -19,18 +23,14 @@ export const AdminPage =  () => {
             } else {
                toast.error("Forbidden")
             }
-        } catch (err: any) {
-            if (err.response && err.response.status === 403) {
-               toast.error("Forbidden")
-            } else {
-                toast.error(err);
-            }
+        } catch (err) {
+            toast.error("Something unexpected");
         }
     }
 
     const onServerAction = () => {
         admin()
-            .then((data) => {
+            .then((data: AdminResponse) => {
                 if(data.success) {
                     toast.success(data.success)
                 }
