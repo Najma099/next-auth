@@ -56,7 +56,7 @@ export const LoginForm = () => {
 
             const existingUser = res.data.user;
             if(!existingUser || !existingUser.email || !existingUser.password) {
-            return setError("Email doesn't exits");
+                return setError("Email doesn't exits");
             }
 
             if(!existingUser.emailVerified) {

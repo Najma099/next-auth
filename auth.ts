@@ -48,16 +48,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             if(token.role && session.user) {
                 session.user.role = token.role as "ADMIN" | "USER";
             }
+
+            if(session.user) {
+                session.user.isTwoFactorEnabled = token.isTwofactorEnabled as boolean;
+            }
             return session;
         },
         async jwt({ token }) {
             try {
                 if (!token.sub) return token;
 
-                const existingUser = await getUserById(token.sub) as { role?: "ADMIN" | "USER" };
+                const existingUser = await getUserById(token.sub) as { role?: "ADMIN" | "USER" , isTwoFactorEnabled?: boolean };
                 if (!existingUser) return token;
 
                 token.role = existingUser.role;
+                token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled as boolean;
                 return token;
             } catch (err) {
                 console.error("JWT callback error:", err);
