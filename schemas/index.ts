@@ -1,7 +1,7 @@
 import * as z from 'zod';
 
 export const SettingsSchema = z.object({
-  name: z.optional(z.string()),
+  name: z.optional(z.string().regex(/^[^\s]+$/, { message: "Username cannot contain spaces" })),
   isTwoFactorEnabled:z.optional(z.boolean()),
   email:z.optional(z.string().email()),
   password: z.optional(z.string().min(6)),
@@ -60,7 +60,8 @@ export const RegisterSchema = z.object({
     .string()
     .trim()
     .min(1, { message: "Username is required" })
-    .max(10, { message: "Username cannot be more than 10 characters" }),
+    .max(10, { message: "Username cannot be more than 10 characters" })
+    .regex(/^[^\s]+$/, { message: "Username cannot contain spaces" })
 });
 
 export const ResetSchema = z.object({

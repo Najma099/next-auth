@@ -31,7 +31,7 @@ export default function Home() {
         <h1 className="text-4xl font-bold drop-shadow-md">Auth</h1>
         <p className="text-lg">A Simple authentication service</p>
         <div>
-          <LoginButton>
+          <LoginButton  asChild>
             <Button variant='secondary' size='lg' className='text-xl'> Sign in</Button>
           </LoginButton>
         </div>

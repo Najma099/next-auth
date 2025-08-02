@@ -3,6 +3,7 @@ import { getUserByEmail } from '@/data/user';
 import { ResetSchema } from '@/schemas/index';
 import { sendPasswordResetEmail } from '@/lib/mail'
 import {  generatePasswordResetToken } from '@/lib/token'
+import { currentUser } from '@/lib/auth'
 
 export async function POST(req: Request) {
     try {
@@ -20,16 +21,16 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Email doesn't exists" });
         }
 
-        // we have to check it's via Credential or not 
+        const userSession = await currentUser();
+        if (!userSession?.isOAuth) {
+            return NextResponse.json({ error: "Password reset not allowed for OAuth accounts" });
+        }
 
-        // TODO: Generate and send reset email here
         const passwordResentToken = await generatePasswordResetToken(email);
-        //console.log(" passwordResentToken:",passwordResentToken);
         await sendPasswordResetEmail(passwordResentToken.email, passwordResentToken.token);
 
         return NextResponse.json({ message: "Reset email sent" });
     } catch (err) {
-        //console.error(err);
         return NextResponse.json({ error: "Internal server error" });
     }
 }

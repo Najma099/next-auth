@@ -41,6 +41,18 @@ export const settings = async (
         return { success: "Verification Email Send!"};
     }
 
+    if (values.name && values.name !== dbUser.name) {
+        const existingNameUser = await db.user.findFirst({
+        where: {
+            name: values.name
+        }
+        });
+
+        if (existingNameUser && existingNameUser.id !== user.id) {
+        return { error: "Username already taken!" };
+        }
+    }
+
     if(values.password && values.newPassword && dbUser.password) {
         const passwordMatch = await bcrypt.hash(values.password, 10);
         values.password =  passwordMatch;
@@ -52,5 +64,6 @@ export const settings = async (
             ...values
         }
     })
+    //check if name already exits in db
     return { success: "Setting updated!"}
 }

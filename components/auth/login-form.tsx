@@ -21,6 +21,7 @@ import { useRouter } from 'next/navigation'
 export const LoginForm = () => {
 
     const searchParams = useSearchParams();
+    //const callbackUrl = searchParams.get('callbackUrl');
     const urlError = searchParams.get("error")=== 'OAuthAccountNotLinked'
         ? "Email is linked with different credential Provider"
         : ""
@@ -56,7 +57,7 @@ export const LoginForm = () => {
 
             const existingUser = res.data.user;
             if(!existingUser || !existingUser.email || !existingUser.password) {
-                return setError("Email doesn't exits");
+                return setError("Email doesn't exists");
             }
 
             if(!existingUser.emailVerified) {
@@ -176,7 +177,7 @@ export const LoginForm = () => {
                                                 asChild
                                                 className='w-full text-left justify-start px-0 text-xs'
                                             >
-                                                <Link href='/auth/reset'>Forgot Passport?</Link>
+                                                <Link href='/auth/reset'>Forgot password?</Link>
                                             </Button>
                                             <FormMessage/>
                                         </FormItem>

@@ -11,6 +11,7 @@ import {Button} from '@/components/ui/button'
 import {FormError} from '@/components/utils/form-error'
 import {FormSucess} from '@/components/utils/form-sucess'
 import { useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 import axios from 'axios'
 import {
     Form,
@@ -25,7 +26,7 @@ export const NewpasswordForm = () => {
 
     const searchParams = useSearchParams();
     const token = searchParams.get("token");
-
+    
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | undefined>('');
     const [success, setSuccess] = useState<string | undefined>('');
@@ -82,7 +83,7 @@ export const NewpasswordForm = () => {
                                         <Input
                                             {...field}
                                             disabled={isPending}
-                                            placeholder='john.doe@example.com'
+                                            placeholder='******'
                                             type='text'
                                             autoComplete="email"
                                         />

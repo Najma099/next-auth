@@ -22,7 +22,7 @@ const SettingPage = () => {
     const [ error, setError] = useState<string | undefined>();
     const [ success, setSuccess] = useState<string | undefined>();
 
-    console.log("user?.isOAuth",user?.isOAuth);
+    //console.log("user?.isOAuth",user?.isOAuth);
     const form = useForm<z.infer<typeof SettingsSchema>>({
         resolver: zodResolver(SettingsSchema),
         defaultValues: {
@@ -30,7 +30,7 @@ const SettingPage = () => {
             email: user?.email || undefined,
             password: undefined,
             newPassword: undefined,
-            isTwoFactorEnabled: user?.isTwoFactorEnabled
+            isTwoFactorEnabled: user?.isTwoFactorEnabled || undefined
         }
     });
 
