@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NextAuth.js Learning Project
 
-## Getting Started
+This is a small project built to explore and understand **NextAuth.js** end-to-end. It demonstrates various authentication flows, session management strategies, and secure access patterns using **Prisma**, **Tailwind CSS**, and **Resend**.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Overview
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The project was created to learn and implement:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Different types of authentication providers:
+  - Credentials (email + password)
+  - Google OAuth
+  - GitHub OAuth
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- JWT callbacks to extend token payload (e.g., adding user role or flags)
 
-## Learn More
+- Fetching authenticated sessions:
+  - On the client side
+  - On the server side (API routes and server components)
 
-To learn more about Next.js, take a look at the following resources:
+- Two-Factor Authentication (2FA) via email
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Forgot password flow with reset link
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Email verification for users signing up via credentials
 
-## Deploy on Vercel
+- API route protection for admin access
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Admin-only server components with role-based restrictions
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Tech Stack
+
+| Technology     | Purpose                                |
+|----------------|----------------------------------------|
+| **Next.js**    | App framework with App Router          |
+| **NextAuth.js**| Authentication and session management  |
+| **Prisma**     | Database ORM                           |
+| **Tailwind CSS**| Styling with utility-first classes    |
+| **Resend**     | Email delivery for verification, reset, 2FA |
+
+---
+
+## Key Highlights
+
+### Authentication
+
+- Custom credentials login with hashed passwords
+- OAuth login via Google and GitHub
+- Email verification required for credentials signup
+
+### Session & JWT
+
+- JWT used for stateless sessions
+- Custom fields added via callbacks (e.g., role, isOAuth flag)
+- Session accessible in both client and server environments
+
+### 2FA
+
+- Optional 2FA setup using codes sent via email
+- Code verification on login after password is entered
+
+### Password Reset
+
+- Forgot password flow with secure token
+- Reset link sent via email using Resend
+
+### Admin Access
+
+- Role-based session management
+- Protected API routes for admin
+- Admin-only server components
+
+---
+## Note from the Author
+
+This project was built purely for learning purposes — to get comfortable with setting up authentication in modern full-stack apps using **NextAuth.js**. I wanted to cover everything from multiple providers to advanced use-cases like 2FA, password reset, and admin access.
+
+If you're exploring how authentication works in Next.js, I hope this gives you a good starting point.
+
