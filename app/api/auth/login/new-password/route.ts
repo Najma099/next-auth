@@ -1,4 +1,3 @@
-import * as z from 'zod';
 import { NewPasswordSchema } from '@/schemas'
 import { NextResponse } from "next/server";
 import { db } from '@/lib/db'

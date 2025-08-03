@@ -22,7 +22,8 @@ export async function POST(req: Request) {
         }
 
         const userSession = await currentUser();
-        if (!userSession?.isOAuth) {
+        //console.log("userSession?.isOAuth",userSession?.isOAuth);
+        if (userSession?.isOAuth) {
             return NextResponse.json({ error: "Password reset not allowed for OAuth accounts" });
         }
 

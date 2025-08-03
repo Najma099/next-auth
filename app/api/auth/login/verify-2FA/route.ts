@@ -5,11 +5,9 @@ import { getUserByEmail } from '@/data/user'
 import { db } from '@/lib/db'
 
 export async function POST(req: Request) {
-  //console.log("Outside try-catch");
   try {
     const { email, id, code } = await req.json();
     const twoFactorToken = await getTwoFactorTokenByEmail(email);
-    //console.log("we got done with getTwoFactorTokenByEmail")
     if(!twoFactorToken )  return NextResponse.json({ error: "No 2FA code!"});
     if(twoFactorToken.token !== code) return NextResponse.json({ error: "Invalid Code"});
 
@@ -22,10 +20,8 @@ export async function POST(req: Request) {
         }
     })
 
-    const existingUser = await getUserByEmail(email);
-    //console.log("we got the user");
+    //const existingUser = await getUserByEmail(email);
     const existingConfirmation = await getTwoFactorConfirmationByUserId(id);
-    //console.log("getTwoFactorConfirmationByUserId");
     if( existingConfirmation) {
         await db.twoFactorConfirmation.delete({
             where: {id: existingConfirmation.id}
@@ -39,7 +35,6 @@ export async function POST(req: Request) {
     });
     return NextResponse.json({success:"the code is valid"});
   } catch (err) {
-    //console.log(err);
     return NextResponse.json({ error: "Token generation failed" });
   }
 }

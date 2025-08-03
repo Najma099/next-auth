@@ -8,10 +8,10 @@ const poppins = Poppins({
   weight: ["400", "700"],
 });
 
-const font = Poppins({
-  subsets: ["latin"],
-  weight: ["600"]
-})
+// const font = Poppins({
+//   subsets: ["latin"],
+//   weight: ["600"]
+// })
 
 export default function Home() {
   return (
